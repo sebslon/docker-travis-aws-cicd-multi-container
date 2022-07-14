@@ -15,9 +15,21 @@ after_success:
   - docker build -t sebastiansloniec/multi-nginx ./nginx
   - docker build -t sebastiansloniec/multi-server ./server
   - docker build -t sebastiansloniec/multi-worker ./worker
-  # Login to dockerhub
+  # Login to dockerhub and push the images (to work with the cloud)
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   - docker push sebastiansloniec/multi-client
   - docker push sebastiansloniec/multi-nginx
   - docker push sebastiansloniec/multi-server
   - docker push sebastiansloniec/multi-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: "us-east-1"
+  app: "multi-docker"
+  env: "Multidocker-env"
+  bucket_name: "elasticbeanstalk-us-east-1-665598615361"
+  bucket_path: "docker-multi"
+  on:
+    branch: main
+  access_key_id: "$AWS_ACCESS_KEY"
+  secret_access_key: "$AWS_SECRET_KEY"
